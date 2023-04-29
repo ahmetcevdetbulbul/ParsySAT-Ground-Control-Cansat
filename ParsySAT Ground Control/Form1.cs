@@ -433,11 +433,13 @@ namespace ParsySAT_Ground_Control
             GL.Rotate(y, 0.0, 0.0, 1.0);
 
             silindir(step, topla, radius, 3, -5);
-            silindir(0.01f, topla, 0.5f, 9, 9.7f);
-            silindir(0.01f, topla, 0.1f, 5, dikey1 + 5);
+            //silindir(0.01f, topla, 0.5f, 9, 9.7f);
+            //silindir(0.01f, topla, 0.1f, 5, dikey1 + 5);
             koni(0.01f, 0.01f, radius, 3.0f, 3, 5);
+
             koni(0.01f, 0.01f, radius, 2.0f, -5.0f, -10.0f);
-            Pervane(9.0f, 11.0f, 0.2f, 0.5f);
+            //Pervane(6.0f, 9.0f, 0.2f, 0.5f);
+
 
             GL.Begin(BeginMode.Lines);
 
@@ -503,7 +505,7 @@ namespace ParsySAT_Ground_Control
         private void sEnable_Click(object sender, EventArgs e)
         {
 
-            string file_name = @"C:\Users\USER\Desktop\cansat_2023_simp.txt.txt";
+            string file_name = @"C:\Users\USER\Desktop\cansat_2023_simp.txt";
             string textLine = "";
             string textLine1 = "";
 
