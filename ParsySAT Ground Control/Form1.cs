@@ -34,8 +34,9 @@ namespace ParsySAT_Ground_Control
         double sim_zaman = 0;
         int telemetri = 0;
         Double x = 0, y = 0, z = 0;
-        double enlem = 0;
-        double boylam = 0;
+        double enlem = 39.89026749492359;
+        double boylam = 32.658250221507025;
+        //39.89026749492359, 32.658250221507025
         //Landing_speed
         DataTable table = new DataTable();
 
@@ -77,15 +78,15 @@ namespace ParsySAT_Ground_Control
             
 
             //map.MinZoom = 10;
-            //map.MaxZoom = 1000;
-            //map.Zoom = 20;
+            //map.MaxZoom = 50;
+            map.Zoom = 15;
             map.Position = new GMap.NET.PointLatLng(enlem, boylam);
 
 
 
             timer1.Interval = 1000;
             timer2.Interval= 1000;
-            sim_timer.Interval = 1000;
+            sim_timer.Interval = 1100;
             timer2.Start();
             label17.Text = DateTime.Now.ToString();
 
@@ -538,14 +539,14 @@ namespace ParsySAT_Ground_Control
             serialPort1.Open();
             checkBox1.Checked = true;
             
-            serialPort1.Write("CMD,1077,SIM,ENABLE");
+            //serialPort1.Write("CMD,1077,SIM,ENABLE");
         }
 
         private void sActivate_Click(object sender, EventArgs e)
         {
             checkBox2.Checked = true;
             
-            serialPort1.Write("CMD,1077,SIM,ACTIVATE");
+            serialPort1.Write("A");
             if (checkBox2.Checked && checkBox1.Checked) { checkBox3.Checked = true; }
             sim_timer.Start();
 
@@ -585,10 +586,15 @@ namespace ParsySAT_Ground_Control
             checkBox2.Checked = false;
             checkBox1.Checked = false;
             sim_timer.Stop();
+            serialPort1.Close();
         }
 
         private void sim_timer_Tick(object sender, EventArgs e)
         {
+            if (richTextBox1.Lines[i] == "")
+            {
+                sim_timer.Stop();
+            }
             sim_TextBox.Text = richTextBox1.Lines[i];
             if (i == richTextBox1.TextLength - 1)
             {
@@ -605,8 +611,15 @@ namespace ParsySAT_Ground_Control
 
             
             sim_zaman += 1;
-            
-            PointAltitude.Add(new PointPair(sim_zaman, Convert.ToDouble(simData.ToString())));
+            try
+            {
+                if( (Convert.ToDouble(simData.ToString()) / 10000) < 100 || (Convert.ToDouble(simData.ToString()) / 10000) > 1000) { simData = "9000000"; } 
+                PointAltitude.Add(new PointPair(sim_zaman, Convert.ToDouble(simData.ToString()) / 10000));
+            }
+            catch (Exception hata)
+            {
+                //MessageBox.Show(hata.StackTrace);
+            }
             Altitude.XAxis.Scale.Max = sim_zaman;
             Altitude.AxisChange();
             zedGraphControl1.Refresh();
