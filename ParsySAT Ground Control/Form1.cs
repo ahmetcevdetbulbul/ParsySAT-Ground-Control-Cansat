@@ -18,6 +18,7 @@ using System.Diagnostics;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using System.Windows;
+using System.Threading;
 
 namespace ParsySAT_Ground_Control
 {
@@ -25,6 +26,7 @@ namespace ParsySAT_Ground_Control
     {
 
         //Vector data = new Vector();
+        int packent_count = 0;
         string inData = "null";
         string simData = "0";
         int i = 0;
@@ -86,7 +88,8 @@ namespace ParsySAT_Ground_Control
 
             timer1.Interval = 1000;
             timer2.Interval= 1000;
-            sim_timer.Interval = 1100;
+            sim_timer.Interval = 1000;
+            
             timer2.Start();
             label17.Text = DateTime.Now.ToString();
 
@@ -112,17 +115,18 @@ namespace ParsySAT_Ground_Control
             table.Columns.Add("PC_DEPLOYED", typeof(string));//7
             table.Columns.Add("MAST_RAISED", typeof(string));//8
             table.Columns.Add("TEMPERATURE", typeof(string));//9
-            table.Columns.Add("VOLTAGE", typeof(string));//10
+            table.Columns.Add("PRESSURE", typeof(string));//10
+            table.Columns.Add("VOLTAGE", typeof(string));//11
             table.Columns.Add("GPS_TIME", typeof(string));
-            table.Columns.Add("GPS_ALTITUDE", typeof(string));//12
-            table.Columns.Add("GPS_LATITUDE", typeof(string));//13
+            table.Columns.Add("GPS_ALTITUDE", typeof(string));//13
+            table.Columns.Add("GPS_LATITUDE", typeof(string));//14
             table.Columns.Add("GPS_LONGITUDE", typeof(string));
-            table.Columns.Add("GPS_SATS", typeof(string));//15
-            table.Columns.Add("TILT_X", typeof(string));
-            table.Columns.Add("TILT_Y", typeof(string));
-            table.Columns.Add("CMD_ECHO", typeof(string));//18
-            table.Columns.Add("TILT_Z", typeof(string));//19
-            //table.Columns.Add("LANDING_SPEED", typeof(string));//20
+            table.Columns.Add("GPS_SATS", typeof(string));//16
+            table.Columns.Add("TILT_X", typeof(string));//17
+            table.Columns.Add("TILT_Y", typeof(string));//18
+            table.Columns.Add("CMD_ECHO", typeof(string));//19
+            //table.Columns.Add("TILT_Z", typeof(string));//20
+            //table.Columns.Add("LANDING_SPEED", typeof(string));//21
 
 
             dataGridView1.DataSource = table;
@@ -142,7 +146,7 @@ namespace ParsySAT_Ground_Control
 
             Temperature.Title.Text = "Temperature - Time Graphic";
             //Landing_speed.Title.Text = "Landing speed - Time Graphic";
-            GPS_Altitude.Title.Text = "GPS Altitude - Time Graphic";
+            GPS_Altitude.Title.Text = "Presure - Time Graphic";
             Voltage.Title.Text = "Voltage - Time Graphic";
             Altitude.Title.Text = "Altitude - Time Graphic";
             //Air_pressure.Title.Text = "Air pressure - Time Graphic";
@@ -177,7 +181,7 @@ namespace ParsySAT_Ground_Control
 
 
             Temperature.YAxis.Scale.Max = 50;
-            GPS_Altitude.YAxis.Scale.Max = 1000;
+            GPS_Altitude.YAxis.Scale.Max = 100;
             //Air_pressure.YAxis.Scale.Max = 1000;
             Voltage.YAxis.Scale.Max = 50;
             //Landing_speed.YAxis.Scale.Max = 500;
@@ -555,6 +559,7 @@ namespace ParsySAT_Ground_Control
         private void On_telemetry_Click(object sender, EventArgs e)
         {
             timer1.Start();
+            
             try
             {
                 if (cboPort.Text == "" || baudRate.Text == "")
@@ -566,7 +571,7 @@ namespace ParsySAT_Ground_Control
                     serialPort1.PortName = cboPort.Text;
                     serialPort1.BaudRate = Convert.ToInt32(baudRate.Text);
                     serialPort1.Open();
-                    button1.Enabled = false;
+                    //button1.Enabled = false;
                 }
             }
 
@@ -581,7 +586,7 @@ namespace ParsySAT_Ground_Control
 
         private void simDisable_Click(object sender, EventArgs e)
         {
-            serialPort1.Write("CMD,1077,SIM,DISABLE");
+            serialPort1.Write("D");
             checkBox3.Checked = false;
             checkBox2.Checked = false;
             checkBox1.Checked = false;
@@ -599,6 +604,7 @@ namespace ParsySAT_Ground_Control
             if (i == richTextBox1.TextLength - 1)
             {
                 timer1.Stop();
+                
             }
             i++;
             serialPort1.Write(sim_TextBox.Text);
@@ -618,7 +624,7 @@ namespace ParsySAT_Ground_Control
             }
             catch (Exception hata)
             {
-                //MessageBox.Show(hata.StackTrace);
+                MessageBox.Show("Simulation error");
             }
             Altitude.XAxis.Scale.Max = sim_zaman;
             Altitude.AxisChange();
@@ -630,13 +636,15 @@ namespace ParsySAT_Ground_Control
 
         private void set_time_Click(object sender, EventArgs e)
         {
-            serialPort1.Write("CMD,1077,ST,"+DateTime.Now);
+            serialPort1.Write("CMD,1077,ST,"+DateTime.Now);//sadece saat
+
             
         }
 
         private void off_telemetry_Click(object sender, EventArgs e)
         {
             serialPort1.Close();    
+            timer1.Stop();
         }
 
         private void timer2_Tick(object sender, EventArgs e)
@@ -644,6 +652,18 @@ namespace ParsySAT_Ground_Control
             dataGridView1.FirstDisplayedScrollingRowIndex = dataGridView1.RowCount - 1;
             label17.Text = DateTime.Now.ToString();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void calib_altitude_Click(object sender, EventArgs e)
+        {
+            serialPort1.Write("S");
+        }
+
+        
 
         private void glControl1_Load(object sender, EventArgs e)
         {
@@ -654,16 +674,30 @@ namespace ParsySAT_Ground_Control
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            string inData = serialPort1.ReadExisting();
-            data = inData.Split(',').Select(sValue => sValue.Trim()).ToArray();
+            try
+            {
+                string inData = serialPort1.ReadExisting();
+                data = inData.Split(',').Select(sValue => sValue.Trim()).ToArray();
+                
+                
+            }
+            catch (Exception hata)
+            {
+                //MessageBox.Show("data not recived");
+            }
 
+            try {
+                //enlem = Convert.ToDouble(data[14].ToString()) / 100000;
+                //boylam = Convert.ToDouble(data[15].ToString()) / 100000;
+            }
+            catch (Exception hata)
+            {
+                //MessageBox.Show("gps hata");
+            }
 
-           
-
-            enlem = Convert.ToDouble(data[13].ToString()) / 100000;
-            boylam = Convert.ToDouble(data[14].ToString()) / 100000;
-
-
+            
+            //enlem = enlem + 0.0000017;
+            //boylam = boylam + 0.0000013;
 
             map.Position = new GMap.NET.PointLatLng(enlem, boylam);
             PointLatLng point = new PointLatLng(enlem, boylam);
@@ -674,40 +708,50 @@ namespace ParsySAT_Ground_Control
             markers.Markers.Add(marker);
 
             map.Overlays.Add(markers);
-            enlem = enlem + 0.005;
-            boylam = boylam + 0.005;
+            //enlem = enlem + 0.005;
+            //boylam = boylam + 0.005;
 
 
 
             /////////////////////////////
             try
             {
+
+                textBox1.Text = data[2];
                 glControl1.Invalidate();
                 telemetri++;
+                //packent_count++;
+                textBox8.Text = "0";
+                z = 0;
+                
+                //double new_y = Convert.ToDouble(data[18]);
+                //string new2_y = new_y.ToString("F3");
+                y = Convert.ToDouble(data[18].ToString()) /1000;
+                textBox9.Text = data[18];
+                //* 3141.59 / 180;
 
-                textBox8.Text = data[19];
-                z = Convert.ToDouble(data[19].ToString()) / 10;
-                textBox9.Text = data[17];
-                y = Convert.ToDouble(data[17].ToString()) / 10;
-                textBox10.Text = data[16];
-                x = Convert.ToDouble(data[16].ToString()) / 10;
+                //double new_x = Convert.ToDouble(data[17]);
+                //string new2_x = new_x.ToString("F3");
+                textBox10.Text = data[17];
+                x = Convert.ToDouble(data[17].ToString()) /1000;
 
 
                 string[] values = data;
 
 
-                for (int i = 0; i < data.Length; i++)
-                {
+                //for (int i = 0; i < data.Length; i++)
+                //{
 
-                    string[] row = new string[data.Length];
+                //    string[] row = new string[data.Length];
 
-                    for (int j = 0; j < values.Length; j++)
-                    {
-                        row[j] = values[j].Trim();
-                        data[j] = row[j];
-                    }
-                    table.Rows.Add(row);
-                }
+                //    for (int j = 0; j < values.Length; j++)
+                //    {
+                //        row[j] = values[j].Trim();
+                //        data[j] = row[j];
+                //    }
+                //    table.Rows.Add(row);
+                //}
+                table.Rows.Add(values);
 
                 if (telemetri == 800)
                 {
@@ -747,7 +791,7 @@ namespace ParsySAT_Ground_Control
 
                 }
 
-                
+
 
 
                 if (data.Length != 2)
@@ -756,12 +800,14 @@ namespace ParsySAT_Ground_Control
 
                    
 
-                    PointTemperature.Add(new PointPair(zaman, Convert.ToDouble(data[9].ToString()) / 100));
-                    PointGPS_Altitude.Add(new PointPair(zaman, Convert.ToDouble(data[12].ToString()) / 100));//5
+                    PointTemperature.Add(new PointPair(zaman, Convert.ToDouble(data[9].ToString()) ));
+                    PointGPS_Altitude.Add(new PointPair(zaman, Convert.ToDouble(data[10].ToString()) / 1000));//5
                     //PointLanding_speed.Add(new PointPair(zaman, Convert.ToDouble(data[20].ToString()) / 100));
                     //PointAir_pressure.Add(new PointPair(zaman, Convert.ToDouble(data[7].ToString()) / 100));
-                    PointVoltage.Add(new PointPair(zaman, Convert.ToDouble(data[10].ToString()) / 100));
-                    PointAltitude.Add(new PointPair(zaman, Convert.ToDouble(data[5].ToString()) / 100));
+                    PointVoltage.Add(new PointPair(zaman, Convert.ToDouble(data[11].ToString()) / 100));
+
+                    //int alti
+                    PointAltitude.Add(new PointPair(zaman, Convert.ToDouble(data[5].ToString()) ));
                     
 
 

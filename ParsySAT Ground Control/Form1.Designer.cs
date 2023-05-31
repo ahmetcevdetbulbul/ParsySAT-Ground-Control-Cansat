@@ -77,6 +77,8 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.excele_aktar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -182,9 +184,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(1049, 72);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(166, 16);
+            this.label2.Size = new System.Drawing.Size(155, 16);
             this.label2.TabIndex = 15;
-            this.label2.Text = "GPS Altitude (m) - Time (s) ";
+            this.label2.Text = "Pressure(kPa) - Time (s) ";
             // 
             // label3
             // 
@@ -449,6 +451,7 @@
             this.calib_altitude.TabIndex = 86;
             this.calib_altitude.Text = "Separation";
             this.calib_altitude.UseVisualStyleBackColor = false;
+            this.calib_altitude.Click += new System.EventHandler(this.calib_altitude_Click);
             // 
             // checkBox3
             // 
@@ -478,6 +481,7 @@
             this.button1.TabIndex = 89;
             this.button1.Text = "Calibrate Altitude";
             this.button1.UseVisualStyleBackColor = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // off_telemetry
             // 
@@ -559,11 +563,29 @@
             // 
             this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(315, 404);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(144, 22);
+            this.textBox1.TabIndex = 96;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(315, 382);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(86, 16);
+            this.label6.TabIndex = 97;
+            this.label6.Text = "Packet Count";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1902, 1002);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.simDisable);
@@ -667,6 +689,8 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label6;
     }
 }
 
